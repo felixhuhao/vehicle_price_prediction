@@ -20,30 +20,50 @@ warnings.filterwarnings('ignore')
 
 # ========== 分桶函数 ==========
 def bucket_power(power):
-    if power <= 60: return '01_Micro_Electric'
-    elif power <= 100: return '02_Economy'
-    elif power <= 180: return '03_Best_Seller'
-    elif power <= 300: return '04_Premium'
-    elif power <= 500: return '05_Performance'
-    else: return '06_Hypercar_Exotic'
+    if power <= 60:
+        return '01_Micro_Electric'
+    elif power <= 100:
+        return '02_Economy'
+    elif power <= 180:
+        return '03_Best_Seller'
+    elif power <= 300:
+        return '04_Premium'
+    elif power <= 500:
+        return '05_Performance'
+    else:
+        return '06_Hypercar_Exotic'
 
 def bucket_kilometer(km):
-    if km < 0.1: return '01_Showroom'
-    elif km < 1.0: return '02_Nearly_New'
-    elif km < 3.0: return '03_Prime'
-    elif km < 6.0: return '04_Normal'
-    elif km < 10.0: return '05_Old'
-    elif km < 20.0: return '06_High_Mileage'
-    else: return '07_Scrap_or_RideHailing'
+    if km < 0.1:
+        return '01_Showroom'
+    elif km < 1.0:
+        return '02_Nearly_New'
+    elif km < 3.0:
+        return '03_Prime'
+    elif km < 6.0:
+        return '04_Normal'
+    elif km < 10.0:
+        return '05_Old'
+    elif km < 20.0:
+        return '06_High_Mileage'
+    else:
+        return '07_Scrap_or_RideHailing'
 
 def bucket_car_age(age):
-    if pd.isna(age): return '00_Unknown'
-    if age <= 1: return '01_Nearly_New'
-    elif age <= 3: return '02_Prime'
-    elif age <= 5: return '03_Normal'
-    elif age <= 8: return '04_Mature'
-    elif age <= 12: return '05_Aging'
-    else: return '06_Vintage'
+    if pd.isna(age):
+        return '00_Unknown'
+    if age <= 1:
+        return '01_Nearly_New'
+    elif age <= 3:
+        return '02_Prime'
+    elif age <= 5:
+        return '03_Normal'
+    elif age <= 8:
+        return '04_Mature'
+    elif age <= 12:
+        return '05_Aging'
+    else:
+        return '06_Vintage'
 
 
 # ========== 1. 加载数据 ==========
@@ -201,7 +221,7 @@ FOLD_SEEDS = [42, 123, 2024, 666, 999]
 N_FOLDS = 5
 
 print("\n" + "=" * 60)
-print(f"3. 5 折 CV（每折独立种子 + CV Target Encoding）")
+print("3. 5 折 CV（每折独立种子 + CV Target Encoding）")
 print(f"   折种子: {FOLD_SEEDS}")
 print("=" * 60)
 
@@ -317,7 +337,7 @@ test_cb = np.maximum(test_cb, 1.0)
 test_lgb = np.maximum(test_lgb, 1.0)
 test_xgb = np.maximum(test_xgb, 1.0)
 
-print(f"\n单模型 OOF MAE:")
+print("\n单模型 OOF MAE:")
 print(f"  CatBoost:  {mean_absolute_error(y, oof_cb):.2f}")
 print(f"  LightGBM:  {mean_absolute_error(y, oof_lgb):.2f}")
 print(f"  XGBoost:   {mean_absolute_error(y, oof_xgb):.2f}")
@@ -361,7 +381,7 @@ pred_stack = np.maximum(ridge_final.predict(X_stack_test), 1.0)
 submit_stack = pd.DataFrame({'SaleID': test_SaleID, 'price': pred_stack})
 submit_stack.to_csv('ensemble_stacking_submit.csv', index=False, encoding='utf-8')
 print(f"\n[Stacking] 范围: [{pred_stack.min():.1f}, {pred_stack.max():.1f}]  均值: {pred_stack.mean():.0f}")
-print(f"  已保存: ensemble_stacking_submit.csv")
+print("  已保存: ensemble_stacking_submit.csv")
 
 # --- 加权平均 ---
 def blend_mae(weights):
@@ -373,13 +393,15 @@ best_mae_w, best_w = float('inf'), [1/3, 1/3, 1/3]
 for w0 in np.arange(0.1, 0.9, 0.05):
     for w1 in np.arange(0.1, 0.9 - w0, 0.05):
         w2 = 1.0 - w0 - w1
-        if w2 < 0.05: continue
+        if w2 < 0.05:
+            continue
         mae = blend_mae([w0, w1, w2])
         if mae < best_mae_w:
             best_mae_w, best_w = mae, [w0, w1, w2]
 
 res = minimize(blend_mae, best_w, method='Nelder-Mead', options={'maxiter': 1000, 'xatol': 0.001})
-fw = np.maximum(res.x, 0); fw /= fw.sum()
+fw = np.maximum(res.x, 0)
+fw /= fw.sum()
 
 pred_blend = np.maximum(fw[0] * test_cb + fw[1] * test_lgb + fw[2] * test_xgb, 1.0)
 submit_blend = pd.DataFrame({'SaleID': test_SaleID, 'price': pred_blend})
@@ -387,7 +409,7 @@ submit_blend.to_csv('ensemble_weighted_submit.csv', index=False, encoding='utf-8
 print(f"\n[加权平均] 权重: CB={fw[0]:.3f}  LGB={fw[1]:.3f}  XGB={fw[2]:.3f}")
 print(f"  OOF MAE: {res.fun:.2f}")
 print(f"  范围: [{pred_blend.min():.1f}, {pred_blend.max():.1f}]  均值: {pred_blend.mean():.0f}")
-print(f"  已保存: ensemble_weighted_submit.csv")
+print("  已保存: ensemble_weighted_submit.csv")
 
 
 # ========== 完成 ==========
@@ -398,5 +420,5 @@ print(f"  特征数: {len(feature_cols)}  (含 CV Target Encoding)")
 print(f"  单模型 OOF MAE:  CB={mean_absolute_error(y, oof_cb):.2f}  LGB={mean_absolute_error(y, oof_lgb):.2f}  XGB={mean_absolute_error(y, oof_xgb):.2f}")
 print(f"  Stacking OOF MAE:  {stack_mae:.2f}")
 print(f"  加权平均 OOF MAE:  {res.fun:.2f}")
-print(f"  输出: ensemble_stacking_submit.csv / ensemble_weighted_submit.csv")
+print("  输出: ensemble_stacking_submit.csv / ensemble_weighted_submit.csv")
 print("=" * 60)

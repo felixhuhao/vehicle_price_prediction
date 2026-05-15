@@ -34,7 +34,7 @@ FOLD_SEEDS = [42, 123, 2024, 666, 999]
 print(f"Device: {device}")
 if device.type == 'cuda':
     print(f"  GPU: {torch.cuda.get_device_name(0)}")
-print(f"\nMLP Config:")
+print("\nMLP Config:")
 print(f"  hidden_dims={HIDDEN_DIMS}  dropout={DROPOUT}  lr={LR}")
 print(f"  weight_decay={WEIGHT_DECAY}  epochs={N_EPOCHS}  batch={BATCH_SIZE}  patience={PATIENCE}")
 print(f"  n_mlp_per_fold={N_MLP_PER_FOLD}")
@@ -42,30 +42,50 @@ print(f"  n_mlp_per_fold={N_MLP_PER_FOLD}")
 
 # ========== 分桶函数 ==========
 def bucket_power(power):
-    if power <= 60: return '01_Micro_Electric'
-    elif power <= 100: return '02_Economy'
-    elif power <= 180: return '03_Best_Seller'
-    elif power <= 300: return '04_Premium'
-    elif power <= 500: return '05_Performance'
-    else: return '06_Hypercar_Exotic'
+    if power <= 60:
+        return '01_Micro_Electric'
+    elif power <= 100:
+        return '02_Economy'
+    elif power <= 180:
+        return '03_Best_Seller'
+    elif power <= 300:
+        return '04_Premium'
+    elif power <= 500:
+        return '05_Performance'
+    else:
+        return '06_Hypercar_Exotic'
 
 def bucket_kilometer(km):
-    if km < 0.1: return '01_Showroom'
-    elif km < 1.0: return '02_Nearly_New'
-    elif km < 3.0: return '03_Prime'
-    elif km < 6.0: return '04_Normal'
-    elif km < 10.0: return '05_Old'
-    elif km < 20.0: return '06_High_Mileage'
-    else: return '07_Scrap_or_RideHailing'
+    if km < 0.1:
+        return '01_Showroom'
+    elif km < 1.0:
+        return '02_Nearly_New'
+    elif km < 3.0:
+        return '03_Prime'
+    elif km < 6.0:
+        return '04_Normal'
+    elif km < 10.0:
+        return '05_Old'
+    elif km < 20.0:
+        return '06_High_Mileage'
+    else:
+        return '07_Scrap_or_RideHailing'
 
 def bucket_car_age(age):
-    if pd.isna(age): return '00_Unknown'
-    if age <= 1: return '01_Nearly_New'
-    elif age <= 3: return '02_Prime'
-    elif age <= 5: return '03_Normal'
-    elif age <= 8: return '04_Mature'
-    elif age <= 12: return '05_Aging'
-    else: return '06_Vintage'
+    if pd.isna(age):
+        return '00_Unknown'
+    if age <= 1:
+        return '01_Nearly_New'
+    elif age <= 3:
+        return '02_Prime'
+    elif age <= 5:
+        return '03_Normal'
+    elif age <= 8:
+        return '04_Mature'
+    elif age <= 12:
+        return '05_Aging'
+    else:
+        return '06_Vintage'
 
 
 # ========== 1. 加载数据 ==========
@@ -263,7 +283,7 @@ def predict_mlp(model, scaler, X):
 
 # ========== 5. 5 折 CV ==========
 print("\n" + "=" * 60)
-print(f"2. 5 折 MLP CV")
+print("2. 5 折 MLP CV")
 print("=" * 60)
 
 price_bins = pd.qcut(df_train_pp['price'], q=10, labels=False, duplicates='drop')
@@ -333,6 +353,6 @@ print(f"预测范围: [{test_nn.min():.1f}, {test_nn.max():.1f}]  均值: {test_
 # 输出测试集预测
 submit = pd.DataFrame({'SaleID': test_SaleID, 'price': test_nn})
 submit.to_csv('mlp_tune_submit.csv', index=False, encoding='utf-8')
-print(f"已保存: mlp_tune_submit.csv")
+print("已保存: mlp_tune_submit.csv")
 print(f"Config: hidden_dims={HIDDEN_DIMS}  dropout={DROPOUT}  lr={LR}  wd={WEIGHT_DECAY}")
 print("=" * 60)

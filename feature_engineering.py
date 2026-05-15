@@ -38,7 +38,7 @@ for name, df in [('训练集', df_train), ('测试集', df_test)]:
     print(f"  标准差:    {p.std():.1f}")
     print(f"  最小值:    {p.min()}")
     print(f"  最大值:    {p.max()}")
-    print(f"  分位数:")
+    print("  分位数:")
     for q in [0.01, 0.05, 0.25, 0.50, 0.75, 0.95, 0.99]:
         print(f"    {q*100:5.1f}%: {p.quantile(q):.0f}")
     print(f"  = 0 的记录数:     {(p == 0).sum()} ({(p == 0).mean()*100:.2f}%)")

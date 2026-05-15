@@ -184,7 +184,7 @@ df_test_pp = df_test_pp.merge(brand_stats, on='brand', how='left')
 brand_dmg = df_train_pp.groupby('brand')['notRepairedDamage'].mean().reset_index()
 brand_dmg.columns = ['brand', 'brand_dmg_rate']
 
-print(f"brand 损坏率特征数: 1")
+print("brand 损坏率特征数: 1")
 
 df_train_pp = df_train_pp.merge(brand_dmg, on='brand', how='left')
 df_test_pp = df_test_pp.merge(brand_dmg, on='brand', how='left')
@@ -394,5 +394,5 @@ print("\n" + "=" * 60)
 print("建模完成!")
 print(f"  best_iteration: {best_round}")
 print(f"  验证集 MAE:     {mae_val:.2f}")
-print(f"  输出文件:       cb_submit_predictions.csv")
+print("  输出文件:       cb_submit_predictions.csv")
 print("=" * 60)
